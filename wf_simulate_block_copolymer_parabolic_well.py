@@ -268,15 +268,14 @@ print("Reporters ready, starting simulation")
 
 start_timer = perf_counter()
 sim = Simulation(
-        platform="cuda",
+        platform="OpenCL",
         integrator=integrator,
         timestep=timestep,
         error_tol=0.01, 
-        GPU = "0",
         length_scale=length_scale,
         collision_rate=friction_coefficient,
         max_Ek=15,
-        N = len(conf),
+        N=len(conf),
         reporters=reporters,
         PBCbox=PBC_box,
         precision="mixed",

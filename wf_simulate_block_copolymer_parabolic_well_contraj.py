@@ -145,11 +145,10 @@ conf = data["pos"]
 
 start_timer = perf_counter()
 sim = Simulation(
-        platform="cuda",
+        platform="OpenCL",
         integrator=integrator,
         timestep=timestep,
         error_tol=0.01, 
-        GPU="1",
         length_scale=length_scale,
         collision_rate=friction_coefficient,
         max_Ek=15,

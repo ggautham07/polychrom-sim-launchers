@@ -222,11 +222,10 @@ for iteration in range(total_sim_inits):
         start_timer = perf_counter()
 
     sim = Simulation(
-            platform="cuda",
+            platform="OpenCL",
             integrator=integrator,
             timestep=timestep,
             error_tol=0.01,
-            GPU = "1",      # GPU 1 on lifou, 0 on kalam
             length_scale=length_scale,
             collision_rate=friction_coefficient, 
             N = len(conf),
