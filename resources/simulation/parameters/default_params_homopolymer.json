@@ -1,0 +1,14 @@
+{
+    "length_scale": 1.0,
+    "integrator": "langevin",
+    "friction_coefficient": 0.1,
+    "timestep": 100,
+    "moldyn_steps": 1000,
+    "PBC": false,
+    "density": 0.001,
+    "harmonic_bond_length": 1.0,
+    "harmonic_bond_wiggle_dist": 0.4,
+    "polymer_stiffness": 0,
+    "repulsion_energy": 0,
+    "repulsion_energy_radius": 0
+}
