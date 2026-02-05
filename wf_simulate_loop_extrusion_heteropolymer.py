@@ -15,7 +15,6 @@ from polychrom import forcekits
 from polychrom.simulation import Simulation
 from polychrom.starting_conformations import grow_cubic
 from polychrom.hdf5_format import HDF5Reporter, load_hdf5_file
-from custom_reporter import coordinateReporter
 
 
 # To display durations in seconds in a more readable format
@@ -96,7 +95,7 @@ def heteropolymer_parabolic_well(sim_object:Simulation,
 args = sys.argv
 params_file_path = args[1]
 params = json.load(open(params_file_path, mode="r"))
-default_params = json.load(open("./resources/simulation/default_params_loop_extrusion_heteropolymer.json", mode="r"))
+default_params = json.load(open(f"/lus/home/CT3/c1916693/gganesh/repositories/polychrom-sim-launchers/resources/simulation/default_params_loop_extrusion_heteropolymer.json", mode="r"))
 
 try:
     polymer_length = params["polymer_length"]
@@ -277,31 +276,26 @@ print(f"Saving every {save_every_blocks * moldyn_steps} timesteps")
 for iteration in range(total_sim_inits):
     if iteration == 0:
         try:
-            conf = np.load(f"./resources/simulation/starting_conformation_N={polymer_length}.npy")
+            conf = np.load(f"/lus/home/CT3/c1916693/gganesh/repositories/polychrom-sim-launchers/resources/simulation/starting_conformation_N={polymer_length}.npy")
             print("Loaded a polymer conformation from a previous equilibriated simulation")
         except FileNotFoundError:
             conf = grow_cubic(polymer_length, int(simbox_length), method="linear")
             print("Starting simulation with a linear chain")
 
-        custom_reporter_flag = True
         reporter_default = HDF5Reporter(folder=sim_dir, max_data_length=saved_block_size, overwrite=True, blocks_only=False)
         reporters = [reporter_default]
-        if custom_reporter_flag:
-            reporter_specific = coordinateReporter(folder=sim_dir, monomer_pos=loci_positions)
-            reporters.append(reporter_specific)
         print("Reporters ready, starting simulation")
 
         start_timer = perf_counter()
 
     sim = Simulation(
-            platform="cuda",
+            platform="OpenCL",
             integrator=integrator,
             timestep=timestep,
             error_tol=0.01, 
-            GPU = "0",      # GPU 1 on lifou, 0 on kalam
             length_scale=length_scale,
             collision_rate=friction_coefficient, 
-            N = len(conf),
+            N=len(conf),
             reporters=reporters,
             PBCbox=PBC_box,
             precision="mixed",
@@ -366,7 +360,5 @@ for iteration in range(total_sim_inits):
     reporter_default.blocks_only = True  # write output hdf5-files only for blocks
 
 reporter_default.dump_data()
-if custom_reporter_flag:
-    reporter_specific.dump_data()
 
 print(f"Simulation completed in {readable_duration(perf_counter() - start_timer)}")

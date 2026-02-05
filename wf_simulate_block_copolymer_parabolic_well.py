@@ -94,7 +94,7 @@ def heteropolymer_parabolic_well(sim_object:Simulation,
 args = sys.argv
 params_file_path = args[1]
 params = json.load(open(params_file_path, mode="r"))
-default_params = json.load(open("./resources/simulation/parameters/default_params_block_copolymer.json"))
+default_params = json.load(open(f"/lus/home/CT3/c1916693/gganesh/repositories/polychrom-sim-launchers/resources/simulation/parameters/default_params_block_copolymer.json"))
 
 try:
     polymer_length = params["polymer_length"]
@@ -256,7 +256,7 @@ print(f"Saving every {save_every_blocks * moldyn_steps} timesteps")
 
 try:
     r = np.random.randint(1, 9)
-    conf = np.load(f"./resources/simulation/configurations/starting_conformation_N={polymer_length}_{r}.npy")
+    conf = np.load(f"/lus/home/CT3/c1916693/gganesh/repositories/polychrom-sim-launchers/resources/simulation/configurations/starting_conformation_N={polymer_length}_{r}.npy")
     print(f"Loaded polymer conformation {r} (from a previous equilibriated simulation")
 except FileNotFoundError:
     conf = grow_cubic(polymer_length, int(simbox_length), method="linear")

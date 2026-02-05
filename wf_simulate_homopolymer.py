@@ -35,7 +35,7 @@ def readable_duration(duration):
 
 args = sys.argv
 params = json.load(open(args[1], mode="r"))
-default_params = json.load(open("./resources/simulation/parameters/default_params_homopolymer.json"))
+default_params = json.load(open(f"/lus/home/CT3/c1916693/gganesh/repositories/polychrom-sim-launchers/resources/simulation/parameters/default_params_homopolymer.json"))
 
 try:
     polymer_length = params["polymer_length"]
@@ -154,7 +154,7 @@ except IndexError:
 print(f"Saving every {save_every_blocks * moldyn_steps} timesteps")
 
 try:
-    conf = np.load(f"./resources/simulation/configurations/starting_conformation_N={polymer_length}.npy")
+    conf = np.load(f"/lus/home/CT3/c1916693/gganesh/repositories/polychrom-sim-launchers/resources/simulation/configurations/starting_conformation_N={polymer_length}.npy")
     print("Loaded a polymer conformation from a previous equilibriated simulation")
 except FileNotFoundError:
     conf = grow_cubic(polymer_length, int(simbox_length), method="linear")

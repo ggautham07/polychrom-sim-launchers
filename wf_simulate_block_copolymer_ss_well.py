@@ -14,7 +14,7 @@ from polychrom import forcekits
 from polychrom.simulation import Simulation
 from polychrom.starting_conformations import grow_cubic
 from polychrom.hdf5_format import HDF5Reporter
-from custom_reporter import coordinateReporter
+
 
 # To display durations in seconds in a more readable format
 def readable_duration(duration):
@@ -37,7 +37,7 @@ def readable_duration(duration):
 args = sys.argv
 params_file_path = args[1]
 params = json.load(open(params_file_path, mode="r"))
-default_params = json.load(open("./resources/simulation/default_params_block_copolymer.json"))
+default_params = json.load(open(f"/lus/home/CT3/c1916693/gganesh/repositories/polychrom-sim-launchers/resources/simulation/default_params_block_copolymer.json"))
 
 try:
     polymer_length = params["polymer_length"]
@@ -171,8 +171,6 @@ if PBC:
 
 interaction_matrix = np.asarray(interaction_matrix)
 
-custom_reporter_flag = False
-
 # Save final parameters to file
 sim_dir = args[3]
 makedirs(sim_dir, exist_ok=False)
@@ -212,7 +210,7 @@ saved_block_size = int(args[4])
 print(f"Saving every {save_every_blocks * moldyn_steps} timesteps")
 
 try:
-    conf = np.load(f"./resources/simulation/starting_conformation_N={polymer_length}.npy")
+    conf = np.load(f"/lus/home/CT3/c1916693/gganesh/repositories/polychrom-sim-launchers/resources/simulation/starting_conformation_N={polymer_length}.npy")
     print("Loaded a polymer conformation from a previous equilibriated simulation")
 except FileNotFoundError:
     conf = grow_cubic(polymer_length, int(simbox_length), method="linear")
@@ -220,22 +218,18 @@ except FileNotFoundError:
 
 reporter_default = HDF5Reporter(folder=sim_dir, max_data_length=saved_block_size, overwrite=True, blocks_only=False)
 reporters = [reporter_default]
-if custom_reporter_flag:
-    reporter_specific = coordinateReporter(folder=sim_dir, monomer_pos=loci_positions)
-    reporters.append(reporter_specific)
 print("Reporters ready, starting simulation")
 
 start_timer = perf_counter()
 sim = Simulation(
-        platform="cuda",
+        platform="OpenCL",
         integrator=integrator,
         timestep=timestep,
         error_tol=0.01, 
-        GPU = "0",
         length_scale=length_scale,
         collision_rate=friction_coefficient,
         max_Ek=10,
-        N = len(conf),
+        N=len(conf),
         reporters=reporters,
         PBCbox=PBC_box,
         precision="mixed",
@@ -282,8 +276,6 @@ for t in range(trajectory_length):
     else:
         sim.integrator.step(moldyn_steps)  # do steps without getting the positions from the GPU (faster)
 reporter_default.dump_data()
-if custom_reporter_flag:
-    reporter_specific.dump_data()
 
 del sim     # delete the simulation object
 print(f"Simulation completed in {readable_duration(perf_counter() - start_timer)}")
